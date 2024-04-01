@@ -1,6 +1,6 @@
 from app import webserver
 from flask import request, jsonify
-from app.task_runner import q_jobs, Task, statuses
+from app.task_runner import q_jobs, Task, statuses, jobs_list
 
 import os
 import json
@@ -35,7 +35,14 @@ def post_endpoint():
 @webserver.route('/api/num_jobs', methods=['GET'])
 def num_jobs():
     nr_jobs = q_jobs.qsize()
-    return jsonify({'num_jobs': nr_jobs})
+    return jsonify({'status': 'done', 'num_jobs': nr_jobs})
+
+@webserver.route('/api/jobs', methods=['GET'])
+def jobs():
+    jobs_aux = []
+    for task in list(q_jobs.queue):
+        jobs_aux.append({task.job_id: task.status})
+    return jsonify({'status': 'done', 'data': jobs_aux})
 
 @webserver.route('/api/get_results/<job_id>', methods=['GET'])
 def get_response(job_id):
@@ -83,7 +90,7 @@ def states_mean_request():
     # Return associated job_id
     
     # creating a Task object    
-    job = Task(webserver.job_counter, statuses[1], data)
+    job = Task(webserver.job_counter, statuses[1], data, jobs_list[0])
     # incrementing the job counter
     webserver.job_counter += 1
     # adding the job to the queue

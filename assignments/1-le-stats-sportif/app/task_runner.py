@@ -1,9 +1,11 @@
 from queue import Queue
 from threading import Thread, Event
 import time
+import os
 
 # done, running, error
 statuses = ['done', 'running', 'error']
+jobs_list = ['states_mean', 'state_mean', 'best5', 'worst5', 'get_results', 'jobs', 'num_jobs']
 q_jobs = Queue()
 
 class ThreadPool:
@@ -19,10 +21,11 @@ class ThreadPool:
         pass
 
 class Task:
-    def __init__(self, job_id, status, data):
+    def __init__(self, job_id, status, data, job_type):
         self.job_id = job_id
         self.status = status
         self.data = data
+        self.job_type = job_type
 
     def run(self):
         pass
