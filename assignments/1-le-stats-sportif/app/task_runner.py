@@ -2,6 +2,10 @@ from queue import Queue
 from threading import Thread, Event
 import time
 
+# done, running, error
+statuses = ['done', 'running', 'error']
+q_jobs = Queue()
+
 class ThreadPool:
     def __init__(self):
         # You must implement a ThreadPool of TaskRunners
@@ -14,9 +18,19 @@ class ThreadPool:
         #   * recreate threads for each task
         pass
 
+class Task:
+    def __init__(self, job_id, status, data):
+        self.job_id = job_id
+        self.status = status
+        self.data = data
+
+    def run(self):
+        pass
+
 class TaskRunner(Thread):
-    def __init__(self):
+    def __init__(self, q_jobs : Queue):
         # TODO: init necessary data structures
+        self.q_jobs = q_jobs
         pass
 
     def run(self):
