@@ -20,3 +20,7 @@ content-type: application/json
 GET http://localhost:5000/api/num_jobs HTTP/1.1
 content-type: application/json
 ###
+
+GET http://localhost:5000/api/jobs HTTP/1.1
+content-type: application/json
+###

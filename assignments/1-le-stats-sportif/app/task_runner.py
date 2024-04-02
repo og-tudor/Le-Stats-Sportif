@@ -6,10 +6,9 @@ import os
 # done, running, error
 statuses = ['done', 'running', 'error']
 jobs_list = ['states_mean', 'state_mean', 'best5', 'worst5', 'get_results', 'jobs', 'num_jobs']
-q_jobs = Queue()
 
 class ThreadPool:
-    def __init__(self):
+    def __init__(self, q_jobs : Queue):
         # You must implement a ThreadPool of TaskRunners
         # Your ThreadPool should check if an environment variable TP_NUM_OF_THREADS is defined
         # If the env var is defined, that is the number of threads to be used by the thread pool
@@ -18,6 +17,48 @@ class ThreadPool:
         # You must NOT:
         #   * create more threads than the hardware concurrency allows
         #   * recreate threads for each task
+
+
+        # self.nr_threads = int(os.getenv('TP_NUM_OF_THREADS', os.cpu_count()))
+        self.nr_threads = 2
+        self.threads = []
+        self.q_jobs = q_jobs
+
+        # for _ in range(self.nr_threads):
+        #     thread = TaskRunner(self.q_jobs)
+        #     thread.start()
+        #     self.threads.append(thread)
+        for i in range(self.nr_threads):
+            thread = TaskRunner(i, self.q_jobs)
+            thread.start()
+            self.threads.append(thread)
+
+    def add_task(self, task):
+        self.q_jobs.put(task)
+    
+    def get_last_task(self):
+        return self.q_jobs.get()
+    
+    def get_all_tasks(self):
+        return list(self.q_jobs.queue)
+    
+    def find_tasks(self, job_id: str):
+        for task in self.q_jobs.queue:
+            print(task.job_id)
+            print(type(task.job_id))
+            if task.job_id == int(job_id):
+                return task
+        return None
+    
+    def get_nr_tasks(self):
+        return self.q_jobs.qsize()
+    
+    # TODO: Implement graceful shutdown
+    def shutdown(self):
+        for thread in self.threads:
+            thread.graceful_shutdown()
+            thread.join()
+
         pass
 
 class Task:
@@ -27,14 +68,18 @@ class Task:
         self.data = data
         self.job_type = job_type
 
-    def run(self):
+    def run(self, thread_id):
+        # TODO
+        print(f"--- Running task {self.job_id} from Thread {thread_id} ---")
         pass
 
 class TaskRunner(Thread):
-    def __init__(self, q_jobs : Queue):
+    def __init__(self, thread_id, q_jobs : Queue):
         # TODO: init necessary data structures
+        super().__init__()
         self.q_jobs = q_jobs
-        pass
+        self.thread_id = thread_id
+        # pass
 
     def run(self):
         while True:
@@ -42,4 +87,12 @@ class TaskRunner(Thread):
             # Get pending job
             # Execute the job and save the result to disk
             # Repeat until graceful_shutdown
+            while True:
+                task = self.q_jobs.get()
+             
+                if task is None:
+                    break
+                task.run(self.thread_id)
+                self.q_jobs.task_done()
+                pass
             pass

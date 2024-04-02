@@ -1,13 +1,15 @@
 from app import webserver
 from flask import request, jsonify
-from app.task_runner import q_jobs, Task, statuses, jobs_list
+from app.task_runner import Task, statuses, jobs_list
 
 import os
 import json
 
+thread_pool = webserver.tasks_runner
+
 def find_task_in_queue(job_id: str):
     # print all items in the queue
-    for task in list(q_jobs.queue):
+    for task in thread_pool.get_all_tasks():
         print(task.job_id)
         print(type(task.job_id))
         if task.job_id == int(job_id):
@@ -34,13 +36,14 @@ def post_endpoint():
 
 @webserver.route('/api/num_jobs', methods=['GET'])
 def num_jobs():
-    nr_jobs = q_jobs.qsize()
+    nr_jobs = thread_pool.get_nr_tasks()
     return jsonify({'status': 'done', 'num_jobs': nr_jobs})
 
 @webserver.route('/api/jobs', methods=['GET'])
 def jobs():
     jobs_aux = []
-    for task in list(q_jobs.queue):
+    tasks = thread_pool.get_all_tasks()
+    for task in tasks:
         jobs_aux.append({task.job_id: task.status})
     return jsonify({'status': 'done', 'data': jobs_aux})
 
@@ -53,7 +56,8 @@ def get_response(job_id):
     if int(job_id) > webserver.job_counter:
         return jsonify({"status": "error1", "reason": "Invalid job_id"})
     # get the task from the queue
-    task = find_task_in_queue(job_id)
+    # task = find_task_in_queue(job_id)
+    task = thread_pool.find_tasks(job_id)
     # if the task is not found
     if task == None:
         return jsonify({"status": "error2", "reason": "Invalid job_id"})
@@ -94,7 +98,8 @@ def states_mean_request():
     # incrementing the job counter
     webserver.job_counter += 1
     # adding the job to the queue
-    q_jobs.put(job)
+    # q_jobs.put(job)
+    thread_pool.add_task(job)
     # returning the job id
     return jsonify({"job_id": job.job_id})
     # return jsonify({"status": "NotImplemented"})
