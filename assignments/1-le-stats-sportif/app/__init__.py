@@ -10,6 +10,10 @@ webserver.tasks_runner = ThreadPool(q_jobs)
 # webserver.task_runner.start()
 
 webserver.data_ingestor = DataIngestor("./nutrition_activity_obesity_usa_subset.csv")
+# webserver.data_ingestor.ingest()
+
+# makes a file test.csv to test if the data is being read correctly
+webserver.data_ingestor.test_ingestion(webserver.data_ingestor.questions_best_is_min[1])
 
 webserver.job_counter = 1
 
