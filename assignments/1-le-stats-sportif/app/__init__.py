@@ -1,9 +1,11 @@
 from flask import Flask
 from app.data_ingestor import DataIngestor
 from app.task_runner import ThreadPool
+from queue import Queue
 
+q_jobs = Queue()
 webserver = Flask(__name__)
-webserver.tasks_runner = ThreadPool()
+webserver.tasks_runner = ThreadPool(q_jobs)
 
 # webserver.task_runner.start()
 
