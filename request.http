@@ -1,3 +1,4 @@
+# STATES MEAN
 POST http://localhost:5000/api/states_mean HTTP/1.1
 content-type: application/json
 
@@ -6,6 +7,7 @@ content-type: application/json
 }
 ###
 
+# STATE MEAN
 POST http://localhost:5000/api/state_mean HTTP/1.1
 content-type: application/json
 
@@ -15,13 +17,13 @@ content-type: application/json
 }
 ###
 
-# /api/get_results/<job_id> 
+# GET RESULT ID 1
 GET http://localhost:5000/api/get_results/1 HTTP/1.1
 content-type: application/json
 ###
 
 
-# /api/get_results/<job_id> 
+# GET RESULT ID 10
 GET http://localhost:5000/api/get_results/10 HTTP/1.1
 content-type: application/json
 ###
