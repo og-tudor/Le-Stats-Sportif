@@ -6,7 +6,8 @@ import os
 
 # done, running, error
 statuses = ['done', 'running', 'error']
-jobs_list = ['states_mean', 'state_mean', 'best5', 'worst5', 'get_results', 'jobs', 'num_jobs']
+jobs_list = ['states_mean', 'state_mean', 'best5', 'worst5', 'global_mean', 
+             'diff_from_mean', 'state_diff_from_mean', 'mean_by_category', 'state_mean_by_category']
 # w_data_store = webserver.data_ingestor.data_store
 
 class ThreadPool:
@@ -114,13 +115,61 @@ class Task:
                     nr_entries += 1
                     # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
                 mean = total / nr_entries
-                result.append({'state': state, 'mean': mean})            
+                result.append({'state': state, 'mean': mean})
 
-        
-        
-        self.result = result
-                
-        pass
+            case 'best5':
+                for state in data:
+                    rows = data[state]
+                    total = 0
+                    nr_entries = 0
+                    for row in rows:
+                        # check if the data is empty
+                        if row[header.index('Data_Value')] == '':
+                            continue
+                        total += float(row[header.index('Data_Value')])
+                        nr_entries += 1
+                        # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
+                    mean = total / nr_entries
+                    result.append({'state': state, 'mean': mean})
+                # sort the result
+                result.sort(key=lambda x: x['mean'], reverse=True)
+                result = result[:5]
+
+            case 'worst5':
+                for state in data:
+                    rows = data[state]
+                    total = 0
+                    nr_entries = 0
+                    for row in rows:
+                        # check if the data is empty
+                        if row[header.index('Data_Value')] == '':
+                            continue
+                        total += float(row[header.index('Data_Value')])
+                        nr_entries += 1
+                        # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
+                    mean = total / nr_entries
+                    result.append({'state': state, 'mean': mean})
+                # sort the result
+                result.sort(key=lambda x: x['mean'])
+                result = result[:5]
+
+            case 'global_mean':
+                total = 0
+                nr_entries = 0
+                for state in data:
+                    rows = data[state]
+                    for row in rows:
+                        # check if the data is empty
+                        if row[header.index('Data_Value')] == '':
+                            continue
+                        total += float(row[header.index('Data_Value')])
+                        nr_entries += 1
+                        # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
+                mean = total / nr_entries
+                result.append({'mean': mean})
+    
+        # end task
+        self.result = result        
 
 class TaskRunner(Thread):
     def __init__(self, thread_id, q_jobs : Queue, data_ingestor, q_results : Queue):
