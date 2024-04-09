@@ -47,6 +47,15 @@ def jobs():
         jobs_aux.append({task.job_id: task.status})
     return jsonify({'status': 'done', 'data': jobs_aux})
 
+# returns a list of all the jobs completed
+@webserver.route('/api/results', methods=['GET'])
+def jobs():
+    jobs_aux = []
+    tasks = thread_pool.get_all_results()
+    for task in tasks:
+        jobs_aux.append({task.job_id: task.status})
+    return jsonify({'status': 'done', 'data': jobs_aux})
+
 @webserver.route('/api/get_results/<job_id>', methods=['GET'])
 def get_response(job_id):
     print(f"JobID is {job_id}")
