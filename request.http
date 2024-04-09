@@ -23,6 +23,16 @@ content-type: application/json
     "state": "Alabama"
 }
 ###
+
+POST http://localhost:5000/api/worst5 HTTP/1.1
+content-type: application/json
+
+{
+    "question": "Percent of adults aged 18 years and older who have an overweight classification",
+    "state": "Alabama"
+}
+###
+
 # /api/get_results/<job_id> 
 GET http://localhost:5000/api/get_results/1 HTTP/1.1
 content-type: application/json

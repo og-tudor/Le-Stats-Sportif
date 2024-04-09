@@ -151,7 +151,7 @@ class Task:
                     mean = total / nr_entries
                     result.append({'state': state, 'mean': mean})
                 # sort the result
-                result.sort(key=lambda x: x['mean'])
+                result.sort(key=lambda x: x['mean'], reverse=True)
                 result = result[:5]
 
             case 'global_mean':
