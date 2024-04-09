@@ -49,7 +49,7 @@ def jobs():
 
 # returns a list of all the jobs completed
 @webserver.route('/api/results', methods=['GET'])
-def jobs():
+def results():
     jobs_aux = []
     tasks = thread_pool.get_all_results()
     for task in tasks:
@@ -60,25 +60,24 @@ def jobs():
 def get_response(job_id):
     print(f"JobID is {job_id}")
     print(type(job_id))
-    # TODO
-    # Check if job_id is valid
+    # TODO Mofify reason message
     if int(job_id) > webserver.job_counter:
-        return jsonify({"status": "error1", "reason": "Invalid job_id"})
+        return jsonify({"status": "error", "reason": "Invalid job_id"})
     # get the task from the queue
     # task = find_task_in_queue(job_id)
     task = thread_pool.find_tasks(job_id)
     # if the task is not found
     if task == None:
-        return jsonify({"status": "error2", "reason": "Invalid job_id"})
+        return jsonify({"status": "error", "reason": "Task not found"})
     if task.status == statuses[2]:
-        return jsonify({"status": "error3", "reason": "Invalid job_id"})
+        return jsonify({"status": "error", "reason": "Error in task"})
     
     if task.status == statuses[1]:
        return jsonify({"status": "running"})
     
     # if the task is done
     if task.status == statuses[0]:
-        data = task.data
+        data = task.result
         return jsonify({"status": "done", "data": data})
 
     # Check if job_id is done and return the result
@@ -94,17 +93,10 @@ def get_response(job_id):
 @webserver.route('/api/states_mean', methods=['POST'])
 def states_mean_request():
     # Get request data
-    request_q = request.json
-    request_q_good = request_q['question']
+    request_q = request.json['question']
     print(f"Got request {request_q}")
-    working_data = webserver.data_ingestor.get_data_by_question(request_q_good)
-    # TODO
-    # Register job. Don't wait for task to finish
-    # Increment job_id counter
-    # Return associated job_id
-    
-    # creating a Task object    
-    job = Task(webserver.job_counter, statuses[1], request_q_good, jobs_list[0], working_data)
+    # creating a Task object
+    job = Task(webserver.job_counter, request_q, jobs_list[0], None)
     # incrementing the job counter
     webserver.job_counter += 1
     # adding the job to the queue
@@ -118,14 +110,16 @@ def states_mean_request():
 def state_mean_request():
     # TODO
     # Get request data
-    data = request.json
-    print(f"Got request {data}")
+    request_q = request.json['question']
+    state = request.json['state']
+    print(f"Got request {request_q}")
     # Register job. Don't wait for task to finish
     # Increment job_id counter
     # Return associated job_id
-
-    return jsonify({"status": "NotImplemented"})
-
+    job = Task(webserver.job_counter, request_q, jobs_list[1], state)
+    webserver.job_counter += 1
+    thread_pool.add_task(job)
+    return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/best5', methods=['POST'])
 def best5_request():

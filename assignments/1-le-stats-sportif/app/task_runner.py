@@ -46,6 +46,9 @@ class ThreadPool:
     def get_all_tasks(self):
         return list(self.q_jobs.queue)
     
+    def get_all_results(self):
+        return list(self.q_results.queue)
+    
     def find_tasks(self, job_id: str):
         for task in self.q_jobs.queue:
             print(task.job_id)
@@ -70,21 +73,36 @@ class ThreadPool:
         pass
 
 class Task:
-    def __init__(self, job_id, status, request_question, job_type, working_data):
+    def __init__(self, job_id, request_question, job_type, state):
         self.job_id = job_id
-        self.status = status
         self.request_question = request_question
         self.job_type = job_type
-        self.working_data = working_data
+        self.state = state
+        self.result = None
 
     def run(self, thread_id, data_ingestor):
         # TODO
         data = data_ingestor.data_store.data[self.request_question]
         header = data_ingestor.data_store.header
         print(f"--- Running task {self.job_id} from Thread {thread_id} ---")
-        if self.job_type == 'states_mean':
-            answer = []
-            for state in data:
+        result = []
+        match self.job_type:
+            case 'states_mean':
+                for state in data:
+                    rows = data[state]
+                    total = 0
+                    nr_entries = 0
+                    for row in rows:
+                        # check if the data is empty
+                        if row[header.index('Data_Value')] == '':
+                            continue
+                        total += float(row[header.index('Data_Value')])
+                        nr_entries += 1
+                        # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
+                    mean = total / nr_entries
+                    result.append({'state': state, 'mean': mean})
+            case 'state_mean':
+                state = self.state
                 rows = data[state]
                 total = 0
                 nr_entries = 0
@@ -96,9 +114,11 @@ class Task:
                     nr_entries += 1
                     # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
                 mean = total / nr_entries
-                answer.append({'state': state, 'mean': mean})
+                result.append({'state': state, 'mean': mean})            
+
         
-        self.data = answer
+        
+        self.result = result
                 
         pass
 
