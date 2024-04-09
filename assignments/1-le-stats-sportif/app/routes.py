@@ -85,16 +85,17 @@ def get_response(job_id):
 @webserver.route('/api/states_mean', methods=['POST'])
 def states_mean_request():
     # Get request data
-    data = request.json
-    print(f"Got request {data}")
-
+    request_q = request.json
+    request_q_good = request_q['question']
+    print(f"Got request {request_q}")
+    working_data = webserver.data_ingestor.get_data_by_question(request_q_good)
     # TODO
     # Register job. Don't wait for task to finish
     # Increment job_id counter
     # Return associated job_id
     
     # creating a Task object    
-    job = Task(webserver.job_counter, statuses[1], data, jobs_list[0])
+    job = Task(webserver.job_counter, statuses[1], request_q_good, jobs_list[0], working_data)
     # incrementing the job counter
     webserver.job_counter += 1
     # adding the job to the queue
