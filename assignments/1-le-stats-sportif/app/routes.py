@@ -124,7 +124,11 @@ def state_mean_request():
 @webserver.route('/api/best5', methods=['POST'])
 def best5_request():
     request_q = request.json['question']
-    return jsonify({"status": "NotImplemented"})
+    print(f"Got request {request_q}")
+    job = Task(webserver.job_counter, request_q, jobs_list[2], None)
+    webserver.job_counter += 1
+    thread_pool.add_task(job)
+    return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/worst5', methods=['POST'])
 def worst5_request():

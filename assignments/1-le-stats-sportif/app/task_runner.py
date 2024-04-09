@@ -86,7 +86,7 @@ class Task:
         data = data_ingestor.data_store.data[self.request_question]
         header = data_ingestor.data_store.header
         print(f"--- Running task {self.job_id} from Thread {thread_id} ---")
-        result = None
+        result = []
         match self.job_type:
             case 'states_mean':
                 for state in data:
@@ -103,6 +103,7 @@ class Task:
                     mean = total / nr_entries
                     result.append({'state': state, 'mean': mean})
             case 'state_mean':
+                result = None
                 state = self.state
                 rows = data[state]
                 total = 0
