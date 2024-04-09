@@ -49,7 +49,7 @@ def jobs():
 
 # returns a list of all the jobs completed
 @webserver.route('/api/results', methods=['GET'])
-def jobs():
+def results():
     jobs_aux = []
     tasks = thread_pool.get_all_results()
     for task in tasks:
