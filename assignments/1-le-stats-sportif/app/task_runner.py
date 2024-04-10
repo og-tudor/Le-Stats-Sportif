@@ -95,6 +95,7 @@ class Task:
         
         match self.job_type:
             case 'states_mean':
+                result = {}
                 for state in data:
                     rows = data[state]
                     total = 0
@@ -105,9 +106,12 @@ class Task:
                             continue
                         total += float(row[header.index('Data_Value')])
                         nr_entries += 1
-                        # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
-                    mean = total / nr_entries
-                    result.append({'state': state, 'mean': mean})
+                    if nr_entries != 0:
+                        mean = total / nr_entries
+                        result[state] = mean
+                    else:
+                        result = None
+
             case 'state_mean':
                 result = None
                 state = self.state

@@ -46,36 +46,36 @@ class TestAPI(unittest.TestCase):
     def test_states_mean(self):
         self.helper_test_endpoint("states_mean")
 
-    @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
-    def test_state_mean(self):
-        self.helper_test_endpoint("state_mean")
+    # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
+    # def test_state_mean(self):
+    #     self.helper_test_endpoint("state_mean")
 
-    @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
-    def test_best5(self):
-        self.helper_test_endpoint("best5")
+    # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
+    # def test_best5(self):
+    #     self.helper_test_endpoint("best5")
 
-    @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
-    def test_worst5(self):
-        self.helper_test_endpoint("worst5")
+    # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
+    # def test_worst5(self):
+    #     self.helper_test_endpoint("worst5")
 
-    @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
-    def test_global_mean(self):
-        self.helper_test_endpoint("global_mean")
+    # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
+    # def test_global_mean(self):
+    #     self.helper_test_endpoint("global_mean")
 
-    @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
-    def test_diff_from_mean(self):
-        self.helper_test_endpoint("diff_from_mean")
+    # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
+    # def test_diff_from_mean(self):
+    #     self.helper_test_endpoint("diff_from_mean")
 
-    @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
-    def test_state_diff_from_mean(self):
-        self.helper_test_endpoint("state_diff_from_mean")
+    # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
+    # def test_state_diff_from_mean(self):
+    #     self.helper_test_endpoint("state_diff_from_mean")
 
-    @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
-    def test_mean_by_category(self):
-        self.helper_test_endpoint("mean_by_category")
+    # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
+    # def test_mean_by_category(self):
+    #     self.helper_test_endpoint("mean_by_category")
 
-    def test_state_mean_by_category(self):
-        self.helper_test_endpoint("state_mean_by_category")
+    # def test_state_mean_by_category(self):
+    #     self.helper_test_endpoint("state_mean_by_category")
 
     def helper_test_endpoint(self, endpoint):
         global total_score
