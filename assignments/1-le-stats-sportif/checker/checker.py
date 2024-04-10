@@ -44,11 +44,11 @@ class TestAPI(unittest.TestCase):
 
     # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
     # def test_states_mean(self):
-    #     self.helper_test_endpoint("states_mean")
+        # self.helper_test_endpoint("states_mean")
 
-    # @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
-    # def test_state_mean(self):
-    #     self.helper_test_endpoint("state_mean")
+    @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
+    def test_state_mean(self):
+        self.helper_test_endpoint("state_mean")
 
     @unittest.skipIf(ONLY_LAST, "Checking only the last added test")
     def test_best5(self):

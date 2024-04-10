@@ -22,8 +22,8 @@ class ThreadPool:
         #   * recreate threads for each task
 
 
-        # self.nr_threads = int(os.getenv('TP_NUM_OF_THREADS', os.cpu_count()))
-        self.nr_threads = 2
+        self.nr_threads = int(os.getenv('TP_NUM_OF_THREADS', os.cpu_count()))
+        # self.nr_threads = 2
         self.threads = []
         self.q_jobs = q_jobs
         self.data_ingestor = data_ingestor
@@ -113,9 +113,8 @@ class Task:
                         result = None
 
             case 'state_mean':
-                result = None
-                state = self.state
-                rows = data[state]
+                result = {}
+                rows = data[self.state]
                 total = 0
                 nr_entries = 0
                 for row in rows:
@@ -124,9 +123,11 @@ class Task:
                         continue
                     total += float(row[header.index('Data_Value')])
                     nr_entries += 1
-                    # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
-                mean = total / nr_entries
-                result = {'state': state, 'mean': mean}
+                if nr_entries != 0:
+                    mean = total / nr_entries
+                    result[self.state] = mean
+                else:
+                    result = None
 
             case 'best5':
                 result = {}
