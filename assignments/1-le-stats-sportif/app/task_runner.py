@@ -125,6 +125,7 @@ class Task:
                 result = {'state': state, 'mean': mean}
 
             case 'best5':
+                result = {}
                 for state in data:
                     rows = data[state]
                     total = 0
@@ -136,11 +137,15 @@ class Task:
                         total += float(row[header.index('Data_Value')])
                         nr_entries += 1
                         # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
-                    mean = total / nr_entries
-                    result.append({'state': state, 'mean': mean})
+                    if nr_entries != 0:
+                        mean = total / nr_entries
+                        result[state] = mean
                 # sort the result
-                result.sort(key=lambda x: x['mean'])
-                result = result[:5]
+                if sorting_order:
+                    result = dict(sorted(result.items(), key=lambda item: item[1], reverse=True))
+                else:
+                    result = dict(sorted(result.items(), key=lambda item: item[1]))
+                result = dict(list(result.items())[:5])
 
             case 'worst5':
                 result = {}
