@@ -28,7 +28,7 @@ class ThreadPool:
         self.q_jobs = q_jobs
         self.data_ingestor = data_ingestor
         self.q_results = Queue()
-
+        self.shutdown_event = False
         # for _ in range(self.nr_threads):
         #     thread = TaskRunner(self.q_jobs)
         #     thread.start()
@@ -66,12 +66,11 @@ class ThreadPool:
         return self.q_jobs.qsize()
     
     # TODO: Implement graceful shutdown
-    def shutdown(self):
+    def graceful_shutdown(self):
+        self.shutdown_event = True
         for thread in self.threads:
-            thread.graceful_shutdown()
+            thread.shutdown_event = True
             thread.join()
-
-        pass
 
 class Task:
     def __init__(self, job_id, request_question, job_type, state):
@@ -205,23 +204,20 @@ class TaskRunner(Thread):
         self.thread_id = thread_id
         self.data_ingestor = data_ingestor
         self.q_results = q_results
+        self.shutdown_event = False
         # pass
 
     def run(self):
         while True:
-            # TODO
-            # Get pending job
-            # Execute the job and save the result to disk
-            # Repeat until graceful_shutdown
-            while True:
-                task = self.q_jobs.get()
-             
-                if task is None:
-                    break
-                task.run(self.thread_id, self.data_ingestor)
-                # modify status to DONE
-                task.status = statuses[0]
-                self.q_results.put(task)
-                self.q_jobs.task_done()
-                pass
+            if self.shutdown_event:
+                break
+            task = self.q_jobs.get()
+            
+            if task is None:
+                continue
+            task.run(self.thread_id, self.data_ingestor)
+            # modify status to DONE
+            task.status = statuses[0]
+            self.q_results.put(task)
+            self.q_jobs.task_done()
             pass

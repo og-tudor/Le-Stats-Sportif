@@ -1,0 +1,15 @@
+GET http://localhost:5000/api/graceful_shutdown HTTP/1.1
+content-type: application/json
+###
+
+POST http://localhost:5000/api/states_mean HTTP/1.1
+content-type: application/json
+
+{
+    "question": "Percent of adults aged 18 years and older who have obesity"
+}
+###
+
+GET http://localhost:5000/api/get_results/1 HTTP/1.1
+content-type: application/json
+###

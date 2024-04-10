@@ -34,6 +34,12 @@ def post_endpoint():
         # Method Not Allowed
         return jsonify({"error": "Method not allowed"}), 405
 
+@webserver.route('/api/graceful_shutdown', methods=['GET'])
+def graceful_shutdown():
+    thread_pool.graceful_shutdown()
+    webserver.shutdown_server()
+    return jsonify({"status": "done"})
+
 @webserver.route('/api/num_jobs', methods=['GET'])
 def num_jobs():
     nr_jobs = thread_pool.get_nr_tasks()
@@ -92,6 +98,8 @@ def get_response(job_id):
 
 @webserver.route('/api/states_mean', methods=['POST'])
 def states_mean_request():
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     # Get request data
     request_q = request.json['question']
     print(f"Got request {request_q}")
@@ -108,8 +116,9 @@ def states_mean_request():
 
 @webserver.route('/api/state_mean', methods=['POST'])
 def state_mean_request():
-    # TODO
-    # Get request data
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
+    
     request_q = request.json['question']
     state = request.json['state']
     print(f"Got request {request_q}")
@@ -123,6 +132,9 @@ def state_mean_request():
 
 @webserver.route('/api/best5', methods=['POST'])
 def best5_request():
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
+    
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[2], None)
@@ -132,6 +144,8 @@ def best5_request():
 
 @webserver.route('/api/worst5', methods=['POST'])
 def worst5_request():
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[3], None)
@@ -141,6 +155,8 @@ def worst5_request():
 
 @webserver.route('/api/global_mean', methods=['POST'])
 def global_mean_request():
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[4], None)

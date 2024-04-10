@@ -1,7 +1,13 @@
-from flask import Flask
+from flask import Flask, request
 from app.data_ingestor import DataIngestor
 from app.task_runner import ThreadPool
 from queue import Queue
+
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
 
 q_jobs = Queue()
 webserver = Flask(__name__)
