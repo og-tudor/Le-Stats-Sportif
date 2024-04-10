@@ -180,6 +180,7 @@ class Task:
                 result = dict(list(result.items())[:5])
 
             case 'global_mean':
+                result = {}
                 total = 0
                 nr_entries = 0
                 for state in data:
@@ -190,9 +191,7 @@ class Task:
                             continue
                         total += float(row[header.index('Data_Value')])
                         nr_entries += 1
-                        # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
-                mean = total / nr_entries
-                result.append({'mean': mean})
+                result = {'global_mean': total / nr_entries}
     
         # end task
         self.result = result        
