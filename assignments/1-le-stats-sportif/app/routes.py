@@ -103,7 +103,7 @@ def states_mean_request():
     # q_jobs.put(job)
     thread_pool.add_task(job)
     # returning the job id
-    return jsonify({"job_id": job.job_id})
+    return jsonify({'job_id': job.job_id})
     # return jsonify({"status": "NotImplemented"})
 
 @webserver.route('/api/state_mean', methods=['POST'])
