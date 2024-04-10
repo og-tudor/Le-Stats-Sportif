@@ -133,7 +133,7 @@ class Task:
                     mean = total / nr_entries
                     result.append({'state': state, 'mean': mean})
                 # sort the result
-                result.sort(key=lambda x: x['mean'], reverse=True)
+                result.sort(key=lambda x: x['mean'])
                 result = result[:5]
 
             case 'worst5':
