@@ -87,6 +87,12 @@ class Task:
         header = data_ingestor.data_store.header
         print(f"--- Running task {self.job_id} from Thread {thread_id} ---")
         result = []
+        # True if the data is in ascending order
+        # False if the data is in descending order
+        sorting_order = True
+        if self.request_question in data_ingestor.questions_best_is_min:
+            sorting_order = False
+        
         match self.job_type:
             case 'states_mean':
                 for state in data:
