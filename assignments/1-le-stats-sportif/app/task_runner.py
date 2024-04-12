@@ -81,6 +81,24 @@ class Task:
         self.state = state
         self.result = None
 
+    def state_mean(self, data, header):
+        result = {}
+        rows = data[self.state]
+        total = 0
+        nr_entries = 0
+        for row in rows:
+            # check if the data is empty
+            if row[header.index('Data_Value')] == '':
+                continue
+            total += float(row[header.index('Data_Value')])
+            nr_entries += 1
+        if nr_entries != 0:
+            mean = total / nr_entries
+            result[self.state] = mean
+        else:
+            result = None
+        return result
+
     def global_mean_f(self, data, header):
         result = {}
         total = 0
@@ -126,21 +144,7 @@ class Task:
                         result[state] = mean
 
             case 'state_mean':
-                result = {}
-                rows = data[self.state]
-                total = 0
-                nr_entries = 0
-                for row in rows:
-                    # check if the data is empty
-                    if row[header.index('Data_Value')] == '':
-                        continue
-                    total += float(row[header.index('Data_Value')])
-                    nr_entries += 1
-                if nr_entries != 0:
-                    mean = total / nr_entries
-                    result[self.state] = mean
-                else:
-                    result = None
+                result = self.state_mean(data, header)
 
             case 'best5':
                 result = {}
