@@ -112,7 +112,15 @@ class Task:
                 total += float(row[header.index('Data_Value')])
                 nr_entries += 1
         result['global_mean'] = total / nr_entries
-        return result 
+        return result
+    
+    def diff_from_mean(self, data, header):
+        state_mean_data = self.state_mean(data, header)
+        global_mean_data = self.global_mean_f(data, header)
+        result = {}
+        for state in state_mean_data:
+            result[state] = state_mean_data[state] - global_mean_data['global_mean']
+        return result
 
     def run(self, thread_id, data_ingestor):
         # TODO
@@ -200,6 +208,8 @@ class Task:
             case 'global_mean':
                 result = self.global_mean_f(data, header)
             # endcase
+            case 'diff_from_mean':
+                result = self.diff_from_mean(data, header)
 
         # end task
         self.result = result       
