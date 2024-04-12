@@ -109,8 +109,6 @@ class Task:
                     if nr_entries != 0:
                         mean = total / nr_entries
                         result[state] = mean
-                    else:
-                        result = None
 
             case 'state_mean':
                 result = None
