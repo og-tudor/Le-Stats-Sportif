@@ -94,7 +94,7 @@ class Task:
             nr_entries += 1
         if nr_entries != 0:
             mean = total / nr_entries
-            result[self.state] = mean
+            result[state] = mean
         else:
             result = None
         return result
