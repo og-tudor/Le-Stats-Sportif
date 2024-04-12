@@ -152,7 +152,7 @@ class Task:
                         result[state] = mean
 
             case 'state_mean':
-                result = self.state_mean_F(data, header, self.state)
+                result = self.state_mean_f(data, header, self.state)
 
             case 'best5':
                 result = {}
