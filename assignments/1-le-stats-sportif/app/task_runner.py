@@ -125,6 +125,16 @@ class Task:
                 result[state] = float('nan')
         return result
     
+    def states_mean_f(self, data, header):
+        result = {}
+        for state in data:
+            state_mean_data = self.state_mean_f(data, header, state)
+            if state_mean_data is not None:
+                result[state] = state_mean_data[state]
+            else:
+                result[state] = float('nan')
+        return result
+    
 
     def run(self, thread_id, data_ingestor):
         # TODO
@@ -140,20 +150,21 @@ class Task:
         
         match self.job_type:
             case 'states_mean':
-                result = {}
-                for state in data:
-                    rows = data[state]
-                    total = 0
-                    nr_entries = 0
-                    for row in rows:
-                        # check if the data is empty
-                        if row[header.index('Data_Value')] == '':
-                            continue
-                        total += float(row[header.index('Data_Value')])
-                        nr_entries += 1
-                    if nr_entries != 0:
-                        mean = total / nr_entries
-                        result[state] = mean
+                result = self.states_mean_f(data, header)
+                # result = {}
+                # for state in data:
+                #     rows = data[state]
+                #     total = 0
+                #     nr_entries = 0
+                #     for row in rows:
+                #         # check if the data is empty
+                #         if row[header.index('Data_Value')] == '':
+                #             continue
+                #         total += float(row[header.index('Data_Value')])
+                #         nr_entries += 1
+                #     if nr_entries != 0:
+                #         mean = total / nr_entries
+                #         result[state] = mean
 
             case 'state_mean':
                 result = self.state_mean_f(data, header, self.state)
