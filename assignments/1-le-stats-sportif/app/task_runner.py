@@ -81,6 +81,21 @@ class Task:
         self.state = state
         self.result = None
 
+    def global_mean_f(self, data, header):
+        result = {}
+        total = 0
+        nr_entries = 0
+        for state in data:
+            rows = data[state]
+            for row in rows:
+                # check if the data is empty
+                if row[header.index('Data_Value')] == '':
+                    continue
+                total += float(row[header.index('Data_Value')])
+                nr_entries += 1
+        result['global_mean'] = total / nr_entries
+        return result 
+
     def run(self, thread_id, data_ingestor):
         # TODO
         data = data_ingestor.data_store.data[self.request_question]
@@ -109,8 +124,6 @@ class Task:
                     if nr_entries != 0:
                         mean = total / nr_entries
                         result[state] = mean
-                    else:
-                        result = None
 
             case 'state_mean':
                 result = {}
@@ -181,21 +194,11 @@ class Task:
                 result = dict(list(result.items())[:5])
 
             case 'global_mean':
-                result = {}
-                total = 0
-                nr_entries = 0
-                for state in data:
-                    rows = data[state]
-                    for row in rows:
-                        # check if the data is empty
-                        if row[header.index('Data_Value')] == '':
-                            continue
-                        total += float(row[header.index('Data_Value')])
-                        nr_entries += 1
-                result = {'global_mean': total / nr_entries}
-    
+                result = self.global_mean_f(data, header)
+            # endcase
+
         # end task
-        self.result = result        
+        self.result = result       
 
 class TaskRunner(Thread):
     def __init__(self, thread_id, q_jobs : Queue, data_ingestor, q_results : Queue):
