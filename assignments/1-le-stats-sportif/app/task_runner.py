@@ -81,9 +81,9 @@ class Task:
         self.state = state
         self.result = None
 
-    def state_mean(self, data, header):
+    def state_mean_f(self, data, header, state):
         result = {}
-        rows = data[self.state]
+        rows = data[state]
         total = 0
         nr_entries = 0
         for row in rows:
@@ -144,7 +144,7 @@ class Task:
                         result[state] = mean
 
             case 'state_mean':
-                result = self.state_mean(data, header)
+                result = self.state_mean_F(data, header, self.state)
 
             case 'best5':
                 result = {}
