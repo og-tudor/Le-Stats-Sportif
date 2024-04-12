@@ -120,7 +120,9 @@ class Task:
         for state in data:
             state_mean_data = self.state_mean_f(data, header, state)
             if state_mean_data is not None:
-                result[state] = state_mean_data[state] - global_mean_data['global_mean']
+                result[state] = global_mean_data['global_mean'] - state_mean_data[state]
+            else :
+                result[state] = float('nan')
         return result
     
 
