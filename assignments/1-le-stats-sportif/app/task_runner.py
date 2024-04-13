@@ -189,8 +189,8 @@ class Task:
         # sort category_result in ascending order by key
         category_result = dict(sorted(category_result.items(), key=lambda item: item[0]))
         # convert the result to string
-        # result[state] = str(category_result)
-        result[state] = json.dumps(category_result, indent=2)
+        result[state] = category_result
+        # result[state] = json.dumps(category_result, indent=2)
         return result
 
     def run(self, thread_id, data_ingestor):
@@ -283,6 +283,12 @@ class Task:
 
             case 'state_diff_from_mean':
                result = self.state_diff_from_mean_f(data, header, self.state)
+
+            case 'mean_by_category':
+                pass
+
+            case 'state_mean_by_category':
+                result = self.state_mean_category_f(data, header, self.state)
 
         # end task
         self.result = result

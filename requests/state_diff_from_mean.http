@@ -1,0 +1,9 @@
+POST http://localhost:5000/api/state_mean HTTP/1.1
+content-type: application/json
+
+{"question": "Percent of adults who report consuming vegetables less than one time daily", "state": "Virgin Islands"}
+###
+
+GET http://localhost:5000/api/get_results/1 HTTP/1.1
+content-type: application/json
+###
