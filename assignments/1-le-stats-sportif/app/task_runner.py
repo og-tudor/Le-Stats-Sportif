@@ -135,6 +135,29 @@ class Task:
                 result[state] = float('nan')
         return result
     
+    def state_mean_category_f(self, data, header, state):
+        result = {}
+        category_data = {}
+        rows = data[state]
+        for row in rows:
+            category = row[header.index('Stratification1')]
+            if category not in category_data:
+                category_data[category] = []
+            category_data[category].append(row[header.index('Data_Value')])
+        for category in category_data:
+            total = 0
+            nr_entries = 0
+            for data_value in category_data[category]:
+                if data_value == '':
+                    continue
+                total += float(data_value)
+                nr_entries += 1
+            if nr_entries != 0:
+                mean = total / nr_entries
+                result[category] = mean
+            else:
+                result[category] = float('nan')
+        return result
 
     def run(self, thread_id, data_ingestor):
         # TODO
