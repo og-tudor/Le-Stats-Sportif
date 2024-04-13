@@ -4,8 +4,17 @@ Main file for defining the routes of the webserver.
 from flask import request, jsonify
 from app import webserver
 from app.task_runner import Task, statuses, jobs_list
+from threading import Lock
+
+lock = Lock()
 
 thread_pool = webserver.tasks_runner
+
+def increment_job_id():
+    """Function to increment the job_id."""
+    with lock:
+        webserver.job_counter += 1
+        return webserver.job_counter
 
 def find_task_in_queue(job_id: str):
     """Function to find a task in the queue based on the job_id."""
@@ -100,7 +109,7 @@ def states_mean_request():
     # creating a Task object
     job = Task(webserver.job_counter, request_q, jobs_list[0], None)
     # incrementing the job counter
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     # adding the job to the queue
     # q_jobs.put(job)
     thread_pool.add_task(job)
@@ -119,7 +128,7 @@ def state_mean_request():
     # Increment job_id counter
     # Return associated job_id
     job = Task(webserver.job_counter, request_q, jobs_list[1], state)
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     thread_pool.add_task(job)
     webserver.logger.info(f"Job {job.job_id} added to the queue --- state_mean_request")
     return jsonify({"job_id": job.job_id})
@@ -130,7 +139,7 @@ def best5_request():
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[2], None)
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     thread_pool.add_task(job)
     webserver.logger.info(f"Job {job.job_id} added to the queue --- best5_request")
     return jsonify({"job_id": job.job_id})
@@ -141,7 +150,7 @@ def worst5_request():
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[3], None)
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     thread_pool.add_task(job)
     webserver.logger.info(f"Job {job.job_id} added to the queue --- worst5_request")
     return jsonify({"job_id": job.job_id})
@@ -152,7 +161,7 @@ def global_mean_request():
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[4], None)
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     thread_pool.add_task(job)
     webserver.logger.info(f"Job {job.job_id} added to the queue --- global_mean_request")
     return jsonify({"job_id": job.job_id})
@@ -163,7 +172,7 @@ def diff_from_mean_request():
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[5], None)
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     thread_pool.add_task(job)
     webserver.logger.info(f"Job {job.job_id} added to the queue --- diff_from_mean_request")
     return jsonify({"job_id": job.job_id})
@@ -175,7 +184,7 @@ def state_diff_from_mean_request():
     state = request.json['state']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[6], state)
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     thread_pool.add_task(job)
     webserver.logger.info(f"Job {job.job_id} added to the queue --- state_diff_from_mean_request")
     return jsonify({"job_id": job.job_id})
@@ -186,7 +195,7 @@ def mean_by_category_request():
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[7], None)
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     thread_pool.add_task(job)
     webserver.logger.info(f"Job {job.job_id} added to the queue --- mean_by_category_request")
     return jsonify({"job_id": job.job_id})
@@ -198,7 +207,7 @@ def state_mean_by_category_request():
     state = request.json['state']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[8], state)
-    webserver.job_counter += 1
+    webserver.job_counter = increment_job_id()
     thread_pool.add_task(job)
     webserver.logger.info(f"Job {job.job_id} added to the queue --- state_mean_by_category_request")
     return jsonify({"job_id": job.job_id})

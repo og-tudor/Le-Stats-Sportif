@@ -4,7 +4,6 @@ Module for running tasks asynchronously using threads.
 from queue import Queue
 from threading import Thread
 import os
-import json
 
 # done, running, error
 statuses = ['done', 'running', 'error']
