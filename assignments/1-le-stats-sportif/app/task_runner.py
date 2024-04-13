@@ -1,16 +1,20 @@
+"""
+Module for running tasks asynchronously using threads.
+"""
 from queue import Queue
-from threading import Thread, Event
-import time
+from threading import Thread
 import os
 import json
 
 # done, running, error
 statuses = ['done', 'running', 'error']
-jobs_list = ['states_mean', 'state_mean', 'best5', 'worst5', 'global_mean', 
+jobs_list = ['states_mean', 'state_mean', 'best5', 'worst5', 'global_mean',
              'diff_from_mean', 'state_diff_from_mean', 'mean_by_category', 'state_mean_by_category']
-# w_data_store = webserver.data_ingestor.data_store
 
 class ThreadPool:
+    """
+    Class for managing the thread pool.
+    """
     def __init__(self, q_jobs : Queue, data_ingestor):
         # You must implement a ThreadPool of TaskRunners
         # Your ThreadPool should check if an environment variable TP_NUM_OF_THREADS is defined
@@ -39,18 +43,23 @@ class ThreadPool:
             self.threads.append(thread)
 
     def add_task(self, task):
+        """ Function to add a task to the queue """
         self.q_jobs.put(task)
-    
+
     def get_last_task(self):
+        """ Function to get the last task from the queue"""
         return self.q_jobs.get()
-    
+
     def get_all_tasks(self):
+        """ Function to get all the tasks from the queue"""
         return list(self.q_jobs.queue)
-    
+
     def get_all_results(self):
+        """ Function to get all the results from the queue"""
         return list(self.q_results.queue)
-    
+
     def find_tasks(self, job_id: str):
+        """ Function to find a task in the queue"""
         for task in self.q_jobs.queue:
             print(task.job_id)
             print(type(task.job_id))
@@ -59,21 +68,23 @@ class ThreadPool:
         for task in self.q_results.queue:
             if task.job_id == int(job_id):
                 return task
-                
+
         return None
-    
+
     def get_nr_tasks(self):
+        """ Function to get the number of tasks in the queue"""
         return self.q_jobs.qsize()
-    
-    # TODO: Implement graceful shutdown
+
     def shutdown(self):
+        """ Function to shutdown the thread pool"""
         for thread in self.threads:
             thread.graceful_shutdown()
             thread.join()
 
-        pass
-
 class Task:
+    """
+    Class for running
+    """
     def __init__(self, job_id, request_question, job_type, state):
         self.job_id = job_id
         self.request_question = request_question
@@ -82,6 +93,7 @@ class Task:
         self.result = None
 
     def state_mean_f(self, data, header, state):
+        """ Function to calculate the mean of a state"""
         result = {}
         rows = data[state]
         total = 0
@@ -100,6 +112,7 @@ class Task:
         return result
 
     def global_mean_f(self, data, header):
+        """ Function to calculate the global mean"""
         result = {}
         total = 0
         nr_entries = 0
@@ -113,8 +126,9 @@ class Task:
                 nr_entries += 1
         result['global_mean'] = total / nr_entries
         return result
-    
+
     def diff_from_mean_f(self, data, header):
+        """ Function to calculate the difference from the global mean"""
         global_mean_data = self.global_mean_f(data, header)
         result = {}
         for state in data:
@@ -124,8 +138,20 @@ class Task:
             else :
                 result[state] = float('nan')
         return result
-    
+
+    def state_diff_from_mean_f(self, data, header, state):
+        """ Function to calculate the difference from the global mean"""
+        result = {}
+        global_mean_data = self.global_mean_f(data, header)
+        state_mean_data = self.state_mean_f(data, header, state)
+        if state_mean_data is not None:
+            result[state] = global_mean_data['global_mean'] - state_mean_data[state]
+        else:
+            result[state] = float('nan')
+        return result
+
     def states_mean_f(self, data, header):
+        """ Function to calculate the mean of all the states"""
         result = {}
         for state in data:
             state_mean_data = self.state_mean_f(data, header, state)
@@ -134,8 +160,9 @@ class Task:
             else:
                 result[state] = float('nan')
         return result
-    
+
     def state_mean_category_f(self, data, header, state):
+        """ Function to calculate the mean of a state for each category"""
         result = {}
         category_result = {}
         category_data = {}
@@ -167,7 +194,7 @@ class Task:
         return result
 
     def run(self, thread_id, data_ingestor):
-        # TODO
+        """ Function to run the task and choose the appropriate function to run based on the job"""
         data = data_ingestor.data_store.data[self.request_question]
         header = data_ingestor.data_store.header
         print(f"--- Running task {self.job_id} from Thread {thread_id} ---")
@@ -177,7 +204,7 @@ class Task:
         sorting_order = True
         if self.request_question in data_ingestor.questions_best_is_min:
             sorting_order = False
-        
+
         match self.job_type:
             case 'states_mean':
                 result = self.states_mean_f(data, header)
@@ -211,7 +238,6 @@ class Task:
                             continue
                         total += float(row[header.index('Data_Value')])
                         nr_entries += 1
-                        # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
                     if nr_entries != 0:
                         mean = total / nr_entries
                         result[state] = mean
@@ -234,7 +260,6 @@ class Task:
                             continue
                         total += float(row[header.index('Data_Value')])
                         nr_entries += 1
-                        # print("state: ", row[header.index('LocationDesc')], "data: ", row[header.index('Data_Value')])
                     # check if nr_entries is 0
                     if nr_entries != 0:
                         mean = total / nr_entries
@@ -256,17 +281,17 @@ class Task:
             case 'diff_from_mean':
                 result = self.diff_from_mean_f(data, header)
 
-            case 'state_mean_by_category':
-                result = self.state_mean_category_f(data, header, self.state)
-            # endcase
-            
+            case 'state_diff_from_mean':
+               result = self.state_diff_from_mean_f(data, header, self.state)
 
         # end task
-        self.result = result       
+        self.result = result
 
 class TaskRunner(Thread):
+    """
+    Class for running
+    """
     def __init__(self, thread_id, q_jobs : Queue, data_ingestor, q_results : Queue):
-        # TODO: init necessary data structures
         super().__init__()
         self.q_jobs = q_jobs
         self.thread_id = thread_id
@@ -275,14 +300,12 @@ class TaskRunner(Thread):
         # pass
 
     def run(self):
+        """ Function to run the task runner and run the tasks in the queue"""
         while True:
-            # TODO
-            # Get pending job
-            # Execute the job and save the result to disk
-            # Repeat until graceful_shutdown
+            # TODO stop using busy waiting
             while True:
                 task = self.q_jobs.get()
-             
+
                 if task is None:
                     break
                 task.run(self.thread_id, self.data_ingestor)
@@ -290,5 +313,3 @@ class TaskRunner(Thread):
                 task.status = statuses[0]
                 self.q_results.put(task)
                 self.q_jobs.task_done()
-                pass
-            pass
