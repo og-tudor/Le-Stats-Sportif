@@ -10,13 +10,17 @@ class TestServer(unittest.TestCase):
         pass
     
     def test_states_mean_request(self):
-        response = requests.post(f"http://127.0.0.1:5000/api/states_mean", json={"question": "Percent of adults aged 18 years and older who have an overweight classification"})
+        sender = requests.post(f"http://127.0.0.1:5000/api/states_mean", json={"question": "Percent of adults aged 18 years and older who have an overweight classification"})
         # Check if the response is correct
-        self.assertEqual(response.status_code, 200)
-        response_data = response.json()
+        self.assertEqual(sender.status_code, 200)
+        received = requests.get(f"http://127.0.0.1:5000/api/get_results/1")
+
+        response_data = sender.json()
         self.assertIn("job_id", response_data)
         # Check if the job_id is an integer
         self.assertIsInstance(response_data["job_id"], int)
+        # assert the response is equal to 32.76268656716418
+        self.assertEqual(received.json()["data"]["Missouri"], 32.76268656716418)
         
     def test_state_mean_request(self):
         response = requests.post(f"http://127.0.0.1:5000/api/state_mean", json={"question": "Percent of adults aged 18 years and older who have an overweight classification",
