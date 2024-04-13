@@ -39,6 +39,7 @@ def post_endpoint():
 def num_jobs():
     """Function to handle GET requests to the '/api/num_jobs' endpoint."""
     nr_jobs = thread_pool.get_nr_tasks()
+    webserver.logger.info(f"Number of jobs are {nr_jobs}")
     return jsonify({'status': 'done', 'num_jobs': nr_jobs})
 
 @webserver.route('/api/jobs', methods=['GET'])
@@ -48,6 +49,7 @@ def jobs():
     tasks = thread_pool.get_all_tasks()
     for task in tasks:
         jobs_aux.append({task.job_id: task.status})
+    webserver.logger.info(f"Jobs are {jobs_aux}")
     return jsonify({'status': 'done', 'data': jobs_aux})
 
 # returns a list of all the jobs completed
@@ -58,6 +60,7 @@ def results():
     tasks = thread_pool.get_all_results()
     for task in tasks:
         jobs_aux.append({task.job_id: task.status})
+    webserver.logger.info(f"Results are {jobs_aux}")
     return jsonify({'status': 'done', 'data': jobs_aux})
 
 @webserver.route('/api/get_results/<job_id>', methods=['GET'])
@@ -83,7 +86,7 @@ def get_response(job_id):
     if task.status == statuses[0]:
         data = task.result
         # log the data
-        webserver.logger.info(f"Data is {task.result}")
+        webserver.logger.info(f"Data for job_id {job_id} is {task.result}")
         return jsonify({"status": "done", "data": data})
     
     return jsonify({'status': 'error', 'reason': 'Unknown error'})
@@ -101,7 +104,7 @@ def states_mean_request():
     # adding the job to the queue
     # q_jobs.put(job)
     thread_pool.add_task(job)
-    webserver.logger.info(f"Job {job.job_id} added to the queue")
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- states_mean_request")
     # returning the job id
     return jsonify({'job_id': job.job_id})
 
@@ -118,6 +121,7 @@ def state_mean_request():
     job = Task(webserver.job_counter, request_q, jobs_list[1], state)
     webserver.job_counter += 1
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- state_mean_request")
     return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/best5', methods=['POST'])
@@ -128,6 +132,7 @@ def best5_request():
     job = Task(webserver.job_counter, request_q, jobs_list[2], None)
     webserver.job_counter += 1
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- best5_request")
     return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/worst5', methods=['POST'])
@@ -138,6 +143,7 @@ def worst5_request():
     job = Task(webserver.job_counter, request_q, jobs_list[3], None)
     webserver.job_counter += 1
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- worst5_request")
     return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/global_mean', methods=['POST'])
@@ -148,6 +154,7 @@ def global_mean_request():
     job = Task(webserver.job_counter, request_q, jobs_list[4], None)
     webserver.job_counter += 1
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- global_mean_request")
     return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/diff_from_mean', methods=['POST'])
@@ -158,6 +165,7 @@ def diff_from_mean_request():
     job = Task(webserver.job_counter, request_q, jobs_list[5], None)
     webserver.job_counter += 1
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- diff_from_mean_request")
     return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/state_diff_from_mean', methods=['POST'])
@@ -169,6 +177,7 @@ def state_diff_from_mean_request():
     job = Task(webserver.job_counter, request_q, jobs_list[6], state)
     webserver.job_counter += 1
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- state_diff_from_mean_request")
     return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/mean_by_category', methods=['POST'])
@@ -179,6 +188,7 @@ def mean_by_category_request():
     job = Task(webserver.job_counter, request_q, jobs_list[7], None)
     webserver.job_counter += 1
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- mean_by_category_request")
     return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/state_mean_by_category', methods=['POST'])
@@ -190,6 +200,7 @@ def state_mean_by_category_request():
     job = Task(webserver.job_counter, request_q, jobs_list[8], state)
     webserver.job_counter += 1
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue --- state_mean_by_category_request")
     return jsonify({"job_id": job.job_id})
 
 # You can check localhost in your browser to see what this displays
