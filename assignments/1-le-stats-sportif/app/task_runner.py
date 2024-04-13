@@ -160,7 +160,7 @@ class Task:
             else:
                 result[state] = float('nan')
         return result
-
+            
     def state_mean_category_f(self, data, header, state):
         """ Function to calculate the mean of a state for each category"""
         result = {}
@@ -188,10 +188,20 @@ class Task:
                 category_result[key] = mean
         # sort category_result in ascending order by key
         category_result = dict(sorted(category_result.items(), key=lambda item: item[0]))
-        # convert the result to string
-        result[state] = category_result
-        # result[state] = json.dumps(category_result, indent=2)
-        return result
+        
+        return category_result
+        
+    def mean_by_category_f(self, data, header):
+        result = {}
+        category_result = {}
+        category_data = {}
+        for state in data:
+            state_data = self.state_mean_category_f(data, header, state)
+            for key in state_data:
+                if key not in category_data:
+                    category_data[key] = []
+                category_data[key].append(state_data[key])
+        return category_data            
 
     def run(self, thread_id, data_ingestor):
         """ Function to run the task and choose the appropriate function to run based on the job"""
@@ -285,7 +295,7 @@ class Task:
                result = self.state_diff_from_mean_f(data, header, self.state)
 
             case 'mean_by_category':
-                pass
+                result = self.mean_by_category_f(data, header)
 
             case 'state_mean_by_category':
                 result = self.state_mean_category_f(data, header, self.state)
