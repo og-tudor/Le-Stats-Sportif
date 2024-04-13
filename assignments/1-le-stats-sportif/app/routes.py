@@ -159,12 +159,13 @@ def diff_from_mean_request():
 @webserver.route('/api/state_diff_from_mean', methods=['POST'])
 def state_diff_from_mean_request():
     """Function to handle POST requests to the '/api/state_diff_from_mean' endpoint."""
-    # Get request data
-    # Register job. Don't wait for task to finish
-    # Increment job_id counter
-    # Return associated job_id
-
-    return jsonify({"status": "NotImplemented"})
+    request_q = request.json['question']
+    state = request.json['state']
+    print(f"Got request {request_q}")
+    job = Task(webserver.job_counter, request_q, jobs_list[6], state)
+    webserver.job_counter += 1
+    thread_pool.add_task(job)
+    return jsonify({"job_id": job.job_id})
 
 @webserver.route('/api/mean_by_category', methods=['POST'])
 def mean_by_category_request():
