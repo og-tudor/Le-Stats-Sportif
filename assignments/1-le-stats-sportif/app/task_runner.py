@@ -188,8 +188,8 @@ class Task:
                 category_result[key] = mean
         # sort category_result in ascending order by key
         category_result = dict(sorted(category_result.items(), key=lambda item: item[0]))
-        
-        return category_result
+        result[state] = category_result
+        return result
         
     def mean_by_category_f(self, data, header):
         result = {}
