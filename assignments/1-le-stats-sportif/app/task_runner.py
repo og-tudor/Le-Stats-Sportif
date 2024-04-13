@@ -138,17 +138,16 @@ class Task:
             else :
                 result[state] = float('nan')
         return result
-    
-    def state_diff_from_mean_f(self, data, header):
+
+    def state_diff_from_mean_f(self, data, header, state):
         """ Function to calculate the difference from the global mean"""
-        global_mean_data = self.global_mean_f(data, header)
         result = {}
-        for state in data:
-            state_mean_data = self.state_mean_f(data, header, state)
-            if state_mean_data is not None:
-                result[state] = global_mean_data['global_mean'] - state_mean_data[state]
-            else :
-                result[state] = float('nan')
+        global_mean_data = self.global_mean_f(data, header)
+        state_mean_data = self.state_mean_f(data, header, state)
+        if state_mean_data is not None:
+            result[state] = global_mean_data['global_mean'] - state_mean_data[state]
+        else:
+            result[state] = float('nan')
         return result
 
     def states_mean_f(self, data, header):
@@ -276,7 +275,7 @@ class Task:
                 result = self.diff_from_mean_f(data, header)
 
             case 'state_diff_from_mean':
-               result = self.state_diff_from_mean_f(data, header)
+               result = self.state_diff_from_mean_f(data, header, self.state)
 
         # end task
         self.result = result
