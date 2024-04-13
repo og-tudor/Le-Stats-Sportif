@@ -82,7 +82,10 @@ def get_response(job_id):
     # if the task is done
     if task.status == statuses[0]:
         data = task.result
+        # log the data
+        webserver.logger.info(f"Data is {task.result}")
         return jsonify({"status": "done", "data": data})
+    
     return jsonify({'status': 'error', 'reason': 'Unknown error'})
 
 @webserver.route('/api/states_mean', methods=['POST'])
@@ -98,6 +101,7 @@ def states_mean_request():
     # adding the job to the queue
     # q_jobs.put(job)
     thread_pool.add_task(job)
+    webserver.logger.info(f"Job {job.job_id} added to the queue")
     # returning the job id
     return jsonify({'job_id': job.job_id})
 

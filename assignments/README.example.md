@@ -1,12 +1,25 @@
-Nume:
-Grupă:
+Name: Frecus Tudor George  
+Group: 334CA
 
-# Tema <NR> TODO
-#### Este recomandat să folosiți diacritice. Se poate opta și pentru realizarea în limba engleză. 
+# Homework 1 - Le Stats Sportif
+<!-- #### Este recomandat să folosiți diacritice. Se poate opta și pentru realizarea în limba engleză.  -->
 
 Organizare
 -
-1. Explicație pentru soluția aleasă:
+<!-- 1. Explicație pentru soluția aleasă: -->
+The project is structured in 4 main files: __init__.py, data_ingestor.py, routes.py and task_runner.py. The __init__.py file is used to initialize the Flask app and the database connection. The data_ingestor.py file is used to ingest the data from the csv files into the database. The routes.py file is used to define the routes of the Flask app. The task_runner.py file is used to process the request for the task.
+
+### Data Ingestion :
+- This class is used to store and interact with the data from the csv files. 
+- The data is stored as an object of the class "DataStore" which contains the data in a dictionary format. The dictionary is structured as follows: 
+    - The keys of the dictionary are the questions from the csv files.
+    - The values of the dictionary are dictionaries where the keys are the states.
+    - The values of the inner dictionaries are lists of dictionaries where each dictionary entry is a row from the csv file.  
+``` data_dict[question][state] ```
+
+- The data is ingested from the csv files using the "read_csv" method. The method reads the csv file and stores the data in the "DataStore" object using the imported csv module.
+
+### Routes :
 
 ***Obligatoriu:*** 
 
@@ -38,7 +51,7 @@ Resurse utilizate
 
 Git
 -
-1. Link către repo-ul de git
+[Le-Stats-Sportif](https://github.com/og-tudor/Le-Stats-Sportif)
 
 Ce să **NU**
 -
