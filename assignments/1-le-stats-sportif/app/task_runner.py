@@ -2,7 +2,7 @@ from queue import Queue
 from threading import Thread, Event
 import time
 import os
-
+import json
 
 # done, running, error
 statuses = ['done', 'running', 'error']
@@ -137,26 +137,33 @@ class Task:
     
     def state_mean_category_f(self, data, header, state):
         result = {}
+        category_result = {}
         category_data = {}
         rows = data[state]
         for row in rows:
-            category = row[header.index('Stratification1')]
-            if category not in category_data:
-                category_data[category] = []
-            category_data[category].append(row[header.index('Data_Value')])
-        for category in category_data:
+            category = row[header.index('StratificationCategory1')]
+            value_category = row[header.index('Stratification1')]
+            key = "(\'" + category + "\'" + ", " + "\'" + value_category + "\')"
+            if key not in category_data:
+                category_data[key] = []
+            category_data[key].append(row)
+        for key in category_data:
             total = 0
             nr_entries = 0
-            for data_value in category_data[category]:
-                if data_value == '':
+            for row in category_data[key]:
+                # check if the data is empty
+                if row[header.index('Data_Value')] == '':
                     continue
-                total += float(data_value)
+                total += float(row[header.index('Data_Value')])
                 nr_entries += 1
             if nr_entries != 0:
                 mean = total / nr_entries
-                result[category] = mean
-            else:
-                result[category] = float('nan')
+                category_result[key] = mean
+        # sort category_result in ascending order by key
+        category_result = dict(sorted(category_result.items(), key=lambda item: item[0]))
+        # convert the result to string
+        # result[state] = str(category_result)
+        result[state] = json.dumps(category_result, indent=2)
         return result
 
     def run(self, thread_id, data_ingestor):
@@ -248,6 +255,11 @@ class Task:
             # endcase
             case 'diff_from_mean':
                 result = self.diff_from_mean_f(data, header)
+
+            case 'state_mean_by_category':
+                result = self.state_mean_category_f(data, header, self.state)
+            # endcase
+            
 
         # end task
         self.result = result       

@@ -182,7 +182,7 @@ def state_mean_by_category_request():
     request_q = request.json['question']
     state = request.json['state']
     print(f"Got request {request_q}")
-    job = Task(webserver.job_counter, request_q, jobs_list[6], state)
+    job = Task(webserver.job_counter, request_q, jobs_list[8], state)
     webserver.job_counter += 1
     thread_pool.add_task(job)
     return jsonify({"job_id": job.job_id})
