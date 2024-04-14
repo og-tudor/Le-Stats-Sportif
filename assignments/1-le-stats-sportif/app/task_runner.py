@@ -317,14 +317,12 @@ class TaskRunner(Thread):
     def run(self):
         """ Function to run the task runner and run the tasks in the queue"""
         while True:
-            # TODO stop using busy waiting
-            while True:
-                task = self.q_jobs.get()
-
-                if task is None:
-                    break
-                task.run(self.thread_id, self.data_ingestor)
-                # modify status to DONE
-                task.status = statuses[0]
-                self.q_results.put(task)
-                self.q_jobs.task_done()
+            task = self.q_jobs.get(block=True, timeout=None)
+            # Failsafe in case the task is None (it should never be None, but just in case)
+            if task is None:
+                continue
+            task.run(self.thread_id, self.data_ingestor)
+            # modify status to DONE
+            task.status = statuses[0]
+            self.q_results.put(task)
+            self.q_jobs.task_done()

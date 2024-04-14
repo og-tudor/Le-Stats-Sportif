@@ -4,7 +4,7 @@ Group: 334CA
 # Homework 1 - Le Stats Sportif
 <!-- #### Este recomandat să folosiți diacritice. Se poate opta și pentru realizarea în limba engleză.  -->
 
-Organizare
+Project Structure
 -
 <!-- 1. Explicație pentru soluția aleasă: -->
 The project is structured in 4 main files: __init__.py, data_ingestor.py, routes.py and task_runner.py. The __init__.py file is used to initialize the Flask app and the database connection. The data_ingestor.py file is used to ingest the data from the csv files into the database. The routes.py file is used to define the routes of the Flask app. The task_runner.py file is used to process the request for the task.
@@ -20,8 +20,35 @@ The project is structured in 4 main files: __init__.py, data_ingestor.py, routes
 - The data is ingested from the csv files using the "read_csv" method. The method reads the csv file and stores the data in the "DataStore" object using the imported csv module.
 
 ### Routes :
+- This file contains the routes of the Flask app.
+- The job counter is used to keep track of the total number of jobs that have been processed.  
+it is synchronized using a lock to avoid race conditions.
+- For a POST_REQUEST, a coresponding task object is created and added to the task queue.   
+Jobs_list indicates what the request is, example: jobs_list[0] = states_mean  
+``` job = Task(webserver.job_counter, question, jobs_list[i], state)  ```
+``` thread_pool.add_task(job) ```
+- For a GET_REQUEST, the response is sent back to the client and   
+it can either be a error message or the result of the task.
 
-***Obligatoriu:*** 
+### Task Runner :
+- The ThreadPool class is used to create a pool of threads that will process the tasks, it is also used to add tasks to the queue, and manage the threads.
+- Each thread from Task Runner class is constantly checking the queue for new tasks and assigns them to the threads in the thread pool.
+- The threads are not busy waiting because the queue.get() method is blocking until a new task is added to the queue. 
+``` task = self.q_jobs.get(block=True, timeout=None) ```
+- When a task is created all information that is needed to process the task is stored in the task object. It sees which type of request it is and it processes the request accordingly.
+- When the task is finished, the result is stored in the task object and the task is added to a queue of finished tasks in the ThreadPool class.
+
+## Implementation
+- All the tasks from the requirements have been implemented.
+- Added a new route ``` http://localhost:5000/api/results ``` which returns the results of all the tasks that have been processed so far and their respective data.
+
+### Mentions :
+- I found the project really useful to learn python, before it I had no experience with python.
+- Learned that Flask is a really powerful tool for creating web applications.
+- I would consider the implementation efficient, the data is stored in a dictionary format which makes it easy to access and process the data. But there are certainly ways to improve the implementation, for example processing the data in a more efficient way.
+- I could have modularized the code better, such that in routes I would only call a method from ThreadPool which would create my Task instead of importing Task class in routes.
+
+<!-- ***Obligatoriu:*** 
 
 
 * De făcut referință la abordarea generală menționată în paragraful de mai sus. Aici se pot băga bucăți de cod/funcții - etc.
@@ -60,4 +87,4 @@ Ce să **NU**
 * Răspunsuri și idei neargumentate
 * Comentarii (din cod) și *TODO*-uri
 
-Acest model de README a fost adaptat după [exemplul de README de la SO](https://github.com/systems-cs-pub-ro/so/blob/master/assignments/README.example.md).
+Acest model de README a fost adaptat după [exemplul de README de la SO](https://github.com/systems-cs-pub-ro/so/blob/master/assignments/README.example.md). -->

@@ -68,7 +68,7 @@ def results():
     jobs_aux = []
     tasks = thread_pool.get_all_results()
     for task in tasks:
-        jobs_aux.append({task.job_id: task.status})
+        jobs_aux.append({task.job_id: task.result})
     webserver.logger.info(f"Results are {jobs_aux}")
     return jsonify({'status': 'done', 'data': jobs_aux})
 
