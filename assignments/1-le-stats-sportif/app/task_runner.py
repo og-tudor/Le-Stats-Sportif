@@ -195,12 +195,29 @@ class Task:
         category_result = {}
         category_data = {}
         for state in data:
-            state_data = self.state_mean_category_f(data, header, state)
-            for key in state_data:
+            for row in data[state]:
+                category = row[header.index('StratificationCategory1')]
+                value_category = row[header.index('Stratification1')]
+                key = "(\'" + state + "\', \'"+ category + "\'" + ", " + "\'" + value_category + "\')"
                 if key not in category_data:
                     category_data[key] = []
-                category_data[key].append(state_data[key])
-        return category_data            
+                category_data[key].append(row)        
+        for key in category_data:
+            total = 0
+            nr_entries = 0
+            for row in category_data[key]:
+                # check if the data is empty
+                if row[header.index('Data_Value')] == '':
+                    continue
+                total += float(row[header.index('Data_Value')])
+                nr_entries += 1
+            if nr_entries != 0:
+                mean = total / nr_entries
+                category_result[key] = mean
+        # sort category_result in ascending order by key
+        category_result = dict(sorted(category_result.items(), key=lambda item: item[0]))
+        result = category_result
+        return result    
 
     def run(self, thread_id, data_ingestor):
         """ Function to run the task and choose the appropriate function to run based on the job"""
