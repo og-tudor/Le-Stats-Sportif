@@ -198,6 +198,9 @@ class Task:
             for row in data[state]:
                 category = row[header.index('StratificationCategory1')]
                 value_category = row[header.index('Stratification1')]
+                # check if the category is empty and skip the row
+                if category == '' or value_category == '':
+                    continue
                 key = "(\'" + state + "\', \'"+ category + "\'" + ", " + "\'" + value_category + "\')"
                 if key not in category_data:
                     category_data[key] = []
@@ -342,7 +345,7 @@ class TaskRunner(Thread):
                 if self.shutdown_event:
                     print(f"Thread {self.thread_id} is shutting down")
                     break
-                print("Timeout occurred, no task available")
+                # print("Timeout occurred, no task available")
                 continue
             # Failsafe in case the task is None (it should never be None, but just in case)
             if task is None:
