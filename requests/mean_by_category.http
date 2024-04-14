@@ -1,0 +1,10 @@
+POST http://localhost:5000/api/mean_by_category HTTP/1.1
+content-type: application/json
+
+{"question": "Percent of adults aged 18 years and older who have an overweight classification"}
+
+###
+
+GET http://localhost:5000/api/get_results/1 HTTP/1.1
+content-type: application/json
+###

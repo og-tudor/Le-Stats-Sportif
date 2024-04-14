@@ -1,0 +1,17 @@
+# INPUT 1
+POST http://localhost:5000/api/diff_from_mean HTTP/1.1
+content-type: application/json
+
+{
+    "question": "Percent of adults aged 18 years and older who have an overweight classification"
+}
+###
+
+
+GET http://localhost:5000/api/get_results/1 HTTP/1.1
+content-type: application/json
+###
+
+GET http://localhost:5000/api/get_results/2 HTTP/1.1
+content-type: application/json
+###
