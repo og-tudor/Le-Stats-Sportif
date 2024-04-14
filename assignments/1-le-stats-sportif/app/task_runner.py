@@ -74,7 +74,6 @@ class ThreadPool:
         """ Function to get the number of tasks in the queue"""
         return self.q_jobs.qsize()
     
-    # TODO: Implement graceful shutdown
     def graceful_shutdown(self):
         self.shutdown_event = True
         for thread in self.threads:
@@ -319,7 +318,15 @@ class TaskRunner(Thread):
     def run(self):
         """ Function to run the task runner and run the tasks in the queue"""
         while True:
-            task = self.q_jobs.get(block=True, timeout=None)
+            try:
+                task = self.q_jobs.get(block=True, timeout=1)
+            # timeout happened, no task available, queue is empty
+            except Exception as e:
+                if self.shutdown_event:
+                    print(f"Thread {self.thread_id} is shutting down")
+                    break
+                print("Timeout occurred, no task available")
+                continue
             # Failsafe in case the task is None (it should never be None, but just in case)
             if task is None:
                 continue

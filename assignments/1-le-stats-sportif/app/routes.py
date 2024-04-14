@@ -47,12 +47,14 @@ def post_endpoint():
 @webserver.route('/api/graceful_shutdown', methods=['GET'])
 def graceful_shutdown():
     thread_pool.graceful_shutdown()
-    webserver.shutdown_server()
-    return jsonify({"status": "done"})
+    # webserver.shutdown_server()
+    return jsonify({"status": "server shut_down"})
 
 @webserver.route('/api/num_jobs', methods=['GET'])
 def num_jobs():
     """Function to handle GET requests to the '/api/num_jobs' endpoint."""
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     nr_jobs = thread_pool.get_nr_tasks()
     webserver.logger.info(f"Number of jobs are {nr_jobs}")
     return jsonify({'status': 'done', 'num_jobs': nr_jobs})
@@ -60,6 +62,8 @@ def num_jobs():
 @webserver.route('/api/jobs', methods=['GET'])
 def jobs():
     """Function to handle GET requests to the '/api/jobs' endpoint."""
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     jobs_aux = []
     tasks = thread_pool.get_all_tasks()
     for task in tasks:
@@ -71,6 +75,8 @@ def jobs():
 @webserver.route('/api/results', methods=['GET'])
 def results():
     """Function to handle GET requests to the '/api/results' endpoint."""
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     jobs_aux = []
     tasks = thread_pool.get_all_results()
     for task in tasks:
@@ -81,6 +87,8 @@ def results():
 @webserver.route('/api/get_results/<job_id>', methods=['GET'])
 def get_response(job_id):
     """Function to handle GET requests to the '/api/get_results/<job_id>' endpoint."""
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     print(f"JobID is {job_id}")
     print(type(job_id))
     if int(job_id) > webserver.job_counter:
@@ -187,6 +195,8 @@ def global_mean_request():
 @webserver.route('/api/diff_from_mean', methods=['POST'])
 def diff_from_mean_request():
     """Function to handle POST requests to the '/api/diff_from_mean' endpoint."""
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[5], None)
@@ -198,6 +208,8 @@ def diff_from_mean_request():
 @webserver.route('/api/state_diff_from_mean', methods=['POST'])
 def state_diff_from_mean_request():
     """Function to handle POST requests to the '/api/state_diff_from_mean' endpoint."""
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     request_q = request.json['question']
     state = request.json['state']
     print(f"Got request {request_q}")
@@ -210,6 +222,8 @@ def state_diff_from_mean_request():
 @webserver.route('/api/mean_by_category', methods=['POST'])
 def mean_by_category_request():
     """Function to handle POST requests to the '/api/mean_by_category' endpoint."""
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     request_q = request.json['question']
     print(f"Got request {request_q}")
     job = Task(webserver.job_counter, request_q, jobs_list[7], None)
@@ -221,6 +235,8 @@ def mean_by_category_request():
 @webserver.route('/api/state_mean_by_category', methods=['POST'])
 def state_mean_by_category_request():
     """Function to handle POST requests to the '/api/state_mean_by_category' endpoint."""
+    if thread_pool.shutdown_event:
+        return jsonify({"status": "error", "reason": "Server is shutting down"})
     request_q = request.json['question']
     state = request.json['state']
     print(f"Got request {request_q}")

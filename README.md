@@ -42,6 +42,19 @@ it can either be a error message or the result of the task.
 - All the tasks from the requirements have been implemented.
 - Added a new route ``` http://localhost:5000/api/results ``` which returns the results of all the tasks that have been processed so far and their respective data.
 - Unit tests could have checked many more edge cases. /api/num_jobs can't really be tested because as soon as a request is made, one of the threads will process it and the number of jobs will be back to 0. I tested it manually with sleep() function and it worked as expected.
+- Gracefull shutdown will wait for the threads to finish their current task and for each queue.get() to timeout. After this the server will shutdown and return a status "server shut_down".
+``` 
+while True:
+    try:
+        task = self.q_jobs.get(block=True, timeout=1)
+    # timeout happened, no task available, queue is empty
+    except Exception as e:
+        if self.shutdown_event:
+            print(f"Thread {self.thread_id} is shutting down")
+            break
+        print("Timeout occurred, no task available")
+        continue
+```
 
 ### Mentions :
 - I found the project really useful to learn python, before it I had no experience with python.
