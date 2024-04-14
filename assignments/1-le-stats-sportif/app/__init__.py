@@ -7,26 +7,21 @@ from app.data_ingestor import DataIngestor
 from app.task_runner import ThreadPool
 import logging
 import logging.handlers
-
-
-
-# def shutdown_server():
-#     func = request.environ.get('werkzeug.server.shutdown')
-#     if func is None:
-#         raise RuntimeError('Not running with the Werkzeug Server')
-#     func()
+import os
 
 q_jobs = Queue()
+results_list = []
 webserver = Flask(__name__)
 
-# webserver.task_runner.start()
+# check if there is a results folder, if it isn't create one
+if not os.path.exists('results'):
+    os.makedirs('results')
 
 webserver.data_ingestor = DataIngestor("./nutrition_activity_obesity_usa_subset.csv")
-webserver.tasks_runner = ThreadPool(q_jobs, webserver.data_ingestor)
-# webserver.data_ingestor.ingest()
+webserver.tasks_runner = ThreadPool(q_jobs, results_list, webserver.data_ingestor)
 
-# makes a file test.csv to test if the data is being read correctly
 webserver.job_counter = 1
+# initialize logger
 webserver.logger = logging.getLogger(__name__)
 webserver.logger.setLevel(logging.INFO)
 handler = logging.handlers.RotatingFileHandler('webserver.log', maxBytes=100000, backupCount=1)

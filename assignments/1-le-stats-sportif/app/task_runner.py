@@ -4,6 +4,7 @@ Module for running tasks asynchronously using threads.
 from queue import Queue
 from threading import Thread
 import os
+import json
 
 # done, running, error
 statuses = ['done', 'running', 'error']
@@ -14,30 +15,16 @@ class ThreadPool:
     """
     Class for managing the thread pool.
     """
-    def __init__(self, q_jobs : Queue, data_ingestor):
-        # You must implement a ThreadPool of TaskRunners
-        # Your ThreadPool should check if an environment variable TP_NUM_OF_THREADS is defined
-        # If the env var is defined, that is the number of threads to be used by the thread pool
-        # Otherwise, you are to use what the hardware concurrency allows
-        # You are free to write your implementation as you see fit, but
-        # You must NOT:
-        #   * create more threads than the hardware concurrency allows
-        #   * recreate threads for each task
-
-
+    def __init__(self, q_jobs : Queue, results_list, data_ingestor):
         self.nr_threads = int(os.getenv('TP_NUM_OF_THREADS', os.cpu_count()))
-        # self.nr_threads = 2
         self.threads = []
         self.q_jobs = q_jobs
         self.data_ingestor = data_ingestor
-        self.q_results = Queue()
         self.shutdown_event = False
-        # for _ in range(self.nr_threads):
-        #     thread = TaskRunner(self.q_jobs)
-        #     thread.start()
-        #     self.threads.append(thread)
+        self.results_list = results_list
+
         for i in range(self.nr_threads):
-            thread = TaskRunner(i, self.q_jobs, self.data_ingestor, self.q_results)
+            thread = TaskRunner(i, self.q_jobs, self.data_ingestor, self.results_list)
             thread.start()
             self.threads.append(thread)
 
@@ -55,26 +42,24 @@ class ThreadPool:
 
     def get_all_results(self):
         """ Function to get all the results from the queue"""
-        return list(self.q_results.queue)
+        return self.results_list
 
     def find_tasks(self, job_id: str):
-        """ Function to find a task in the queue"""
-        for task in self.q_jobs.queue:
-            print(task.job_id)
-            print(type(task.job_id))
-            if task.job_id == int(job_id):
-                return task
-        for task in self.q_results.queue:
-            if task.job_id == int(job_id):
-                return task
+        """ Function to find a task in the job_queue or results_queue by job_id"""
+        job = None
+        for result in self.results_list:
+            if result['job_id'] == int(job_id):
+                job = result
+                return job
+        return job
 
-        return None
 
     def get_nr_tasks(self):
         """ Function to get the number of tasks in the queue"""
         return self.q_jobs.qsize()
     
     def graceful_shutdown(self):
+        """ Function to gracefully shutdown the threads"""
         self.shutdown_event = True
         for thread in self.threads:
             thread.shutdown_event = True
@@ -89,7 +74,6 @@ class Task:
         self.request_question = request_question
         self.job_type = job_type
         self.state = state
-        self.result = None
 
     def state_mean_f(self, data, header, state):
         """ Function to calculate the mean of a state"""
@@ -317,19 +301,21 @@ class Task:
                 result = self.state_mean_category_f(data, header, self.state)
 
         # end task
-        self.result = result
+        # write in a results/{job_id}.json file
+        with open(f"results/{self.job_id}.json", "w") as file:
+            json.dump(result, file)
 
 class TaskRunner(Thread):
     """
     Class for running
     """
-    def __init__(self, thread_id, q_jobs : Queue, data_ingestor, q_results : Queue):
+    def __init__(self, thread_id, q_jobs : Queue, data_ingestor, results_list):
         super().__init__()
         self.q_jobs = q_jobs
         self.thread_id = thread_id
         self.data_ingestor = data_ingestor
-        self.q_results = q_results
         self.shutdown_event = False
+        self.results_list = results_list
         # pass
 
     def run(self):
@@ -342,7 +328,6 @@ class TaskRunner(Thread):
                 if self.shutdown_event:
                     print(f"Thread {self.thread_id} is shutting down")
                     break
-                # print("Timeout occurred, no task available")
                 continue
             # Failsafe in case the task is None (it should never be None, but just in case)
             if task is None:
@@ -350,5 +335,5 @@ class TaskRunner(Thread):
             task.run(self.thread_id, self.data_ingestor)
             # modify status to DONE
             task.status = statuses[0]
-            self.q_results.put(task)
+            self.results_list.append({'job_id': task.job_id, 'status': statuses[0]})
             self.q_jobs.task_done()

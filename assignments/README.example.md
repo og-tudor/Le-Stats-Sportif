@@ -37,6 +37,7 @@ it can either be a error message or the result of the task.
 ``` task = self.q_jobs.get(block=True, timeout=None) ```
 - When a task is created all information that is needed to process the task is stored in the task object. It sees which type of request it is and it processes the request accordingly.
 - When the task is finished, the result is stored in the task object and the task is added to a queue of finished tasks in the ThreadPool class.
+- Reading from a file is thread safe because the get_results() method can read from the file only after the task is
 
 ## Implementation
 - All the tasks from the requirements have been implemented.

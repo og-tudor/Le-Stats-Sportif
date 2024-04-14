@@ -5,6 +5,7 @@ from flask import request, jsonify
 from app import webserver
 from app.task_runner import Task, statuses, jobs_list
 from threading import Lock
+import json
 
 lock = Lock()
 
@@ -79,8 +80,8 @@ def results():
         return jsonify({"status": "error", "reason": "Server is shutting down"})
     jobs_aux = []
     tasks = thread_pool.get_all_results()
-    for task in tasks:
-        jobs_aux.append({task.job_id: task.result})
+    for result in tasks:
+        jobs_aux.append({result['job_id']: result['status']})
     webserver.logger.info(f"Results are {jobs_aux}")
     return jsonify({'status': 'done', 'data': jobs_aux})
 
@@ -95,21 +96,21 @@ def get_response(job_id):
         return jsonify({"status": "error", "reason": "Invalid job_id"})
     # get the task from the queue
     # task = find_task_in_queue(job_id)
-    task = thread_pool.find_tasks(job_id)
+    job = thread_pool.find_tasks(job_id)
+    # check if it is a task or a result
+    
+    
     # if the task is not found
-    if task is None:
-        return jsonify({"status": "error", "reason": "Task not found"})
-    if task.status == statuses[2]:
-        return jsonify({"status": "error", "reason": "Error in task"})
-
-    if task.status == statuses[1]:
+    if job is None:
         return jsonify({"status": "running"})
 
     # if the task is done
-    if task.status == statuses[0]:
-        data = task.result
+    if job['status'] == statuses[0]:
+        # read the data from results/job_id.json
+        with open(f"results/{job_id}.json", "r") as f:
+            data = json.loads(f.read())
         # log the data
-        webserver.logger.info(f"Data for job_id {job_id} is {task.result}")
+        webserver.logger.info(f"Data for job_id {job_id} is {data}")
         return jsonify({"status": "done", "data": data})
     
     return jsonify({'status': 'error', 'reason': 'Unknown error'})
