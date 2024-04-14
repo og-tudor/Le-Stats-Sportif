@@ -109,6 +109,60 @@ class Task:
         else:
             result = None
         return result
+    
+    def best5_f(self, data, header, sorting_order):
+        """ Function to calculate the best 5 states"""
+        result = {}
+        for state in data:
+            rows = data[state]
+            total = 0
+            nr_entries = 0
+            for row in rows:
+                # check if the data is empty
+                if row[header.index('Data_Value')] == '':
+                    continue
+                total += float(row[header.index('Data_Value')])
+                nr_entries += 1
+            if nr_entries != 0:
+                mean = total / nr_entries
+                result[state] = mean
+        # sort the result
+        if sorting_order:
+            result = dict(sorted(result.items(), key=lambda item: item[1], reverse=True))
+        else:
+            result = dict(sorted(result.items(), key=lambda item: item[1]))
+        result = dict(list(result.items())[:5])
+        return result
+    
+    def worst5_f(self, data, header, sorting_order):
+        """ Function to calculate the worst 5 states"""
+        result = {}
+        for state in data:
+            rows = data[state]
+            total = 0
+            nr_entries = 0
+            for row in rows:
+                # check if the data is empty
+                if row[header.index('Data_Value')] == '':
+                    continue
+                total += float(row[header.index('Data_Value')])
+                nr_entries += 1
+            # check if nr_entries is 0
+            if nr_entries != 0:
+                mean = total / nr_entries
+                # result.append({'state': state, 'mean': mean})
+                result[state] = mean
+        # sort the result
+        if sorting_order:
+            # result.sort(key=lambda x: x['mean'])
+            result = dict(sorted(result.items(), key=lambda item: item[1]))
+        else:
+            # result.sort(key=lambda x: x['mean'], reverse=True)
+            result = dict(sorted(result.items(), key=lambda item: item[1], reverse=True))
+        # result = result[:5]
+        result = dict(list(result.items())[:5])
+        return result
+        
 
     def global_mean_f(self, data, header):
         """ Function to calculate the global mean"""
@@ -237,72 +291,15 @@ class Task:
         match self.job_type:
             case 'states_mean':
                 result = self.states_mean_f(data, header)
-                # result = {}
-                # for state in data:
-                #     rows = data[state]
-                #     total = 0
-                #     nr_entries = 0
-                #     for row in rows:
-                #         # check if the data is empty
-                #         if row[header.index('Data_Value')] == '':
-                #             continue
-                #         total += float(row[header.index('Data_Value')])
-                #         nr_entries += 1
-                #     if nr_entries != 0:
-                #         mean = total / nr_entries
-                #         result[state] = mean
 
             case 'state_mean':
                 result = self.state_mean_f(data, header, self.state)
 
             case 'best5':
-                result = {}
-                for state in data:
-                    rows = data[state]
-                    total = 0
-                    nr_entries = 0
-                    for row in rows:
-                        # check if the data is empty
-                        if row[header.index('Data_Value')] == '':
-                            continue
-                        total += float(row[header.index('Data_Value')])
-                        nr_entries += 1
-                    if nr_entries != 0:
-                        mean = total / nr_entries
-                        result[state] = mean
-                # sort the result
-                if sorting_order:
-                    result = dict(sorted(result.items(), key=lambda item: item[1], reverse=True))
-                else:
-                    result = dict(sorted(result.items(), key=lambda item: item[1]))
-                result = dict(list(result.items())[:5])
+                result = self.best5_f(data, header, sorting_order)
 
             case 'worst5':
-                result = {}
-                for state in data:
-                    rows = data[state]
-                    total = 0
-                    nr_entries = 0
-                    for row in rows:
-                        # check if the data is empty
-                        if row[header.index('Data_Value')] == '':
-                            continue
-                        total += float(row[header.index('Data_Value')])
-                        nr_entries += 1
-                    # check if nr_entries is 0
-                    if nr_entries != 0:
-                        mean = total / nr_entries
-                        # result.append({'state': state, 'mean': mean})
-                        result[state] = mean
-                # sort the result
-                if sorting_order:
-                    # result.sort(key=lambda x: x['mean'])
-                    result = dict(sorted(result.items(), key=lambda item: item[1]))
-                else:
-                    # result.sort(key=lambda x: x['mean'], reverse=True)
-                    result = dict(sorted(result.items(), key=lambda item: item[1], reverse=True))
-                # result = result[:5]
-                result = dict(list(result.items())[:5])
+                result = self.worst5_f(data, header, sorting_order)
 
             case 'global_mean':
                 result = self.global_mean_f(data, header)
