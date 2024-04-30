@@ -27,19 +27,19 @@ dictionary format. The dictionary is structured as follows:
  and stores the data in the "DataStore" object using the imported csv module.
 
 - The following are the questions which the server can respond to : 
-- - 'Percent of adults who engage in no leisure-time physical activity'
-- - 'Percent of adults aged 18 years and older who have obesity'
-- - 'Percent of adults aged 18 years and older who have an overweight classification'
-- - 'Percent of adults who achieve at least 300 minutes a week of moderate-intensity aerobic physical activity
+  - 'Percent of adults who engage in no leisure-time physical activity'
+  - 'Percent of adults aged 18 years and older who have obesity'
+  - 'Percent of adults aged 18 years and older who have an overweight classification'
+  - 'Percent of adults who achieve at least 300 minutes a week of moderate-intensity aerobic physical activity
    or 150 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)'
-- - 'Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity
+  - 'Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity
     or 75 minutes a week of vigorous-intensity aerobic physical activity and engage in muscle-strengthening
      activities on 2 or more days a week'
-- - 'Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity
+  - 'Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity
     or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)'
-- - 'Percent of adults who engage in muscle-strengthening activities on 2 or more days a week'
-- - 'Percent of adults who report consuming fruit less than one time daily'
-- - 'Percent of adults who report consuming vegetables less than one time daily'
+  - 'Percent of adults who engage in muscle-strengthening activities on 2 or more days a week'
+  - 'Percent of adults who report consuming fruit less than one time daily'
+  - 'Percent of adults who report consuming vegetables less than one time daily'
 
 ### Routes :
 - This file contains the routes of the Flask app.
